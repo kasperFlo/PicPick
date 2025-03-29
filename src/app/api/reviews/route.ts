@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/db';
-import { Review } from '@/lib/schema';
+import { dbConnect } from '@/lib/DB/db';
+import { Review } from '@/lib/DB/schema';
 
 // This API route handles GET requests to fetch review data
 // and POST requests to create a new Review

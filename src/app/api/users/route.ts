@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/db';
-import { User, initAdminUser } from '@/lib/schema';
+import { dbConnect } from '@/lib/DB/db';
+import { User, initAdminUser } from '@/lib/DB/schema';
 
 // This API route handles GET requests to fetch user data
 export async function GET() {
