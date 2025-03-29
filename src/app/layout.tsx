@@ -15,8 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      {/* Header */}
+    <><div className="bob">
       <header className="flex justify-between items-center p-4 bg-white text-black shadow-md">
         <div className="flex items-center gap-2">
           <span className="text-pink-500 font-bold text-lg">🌟</span>
@@ -33,8 +32,11 @@ export default function RootLayout({
           Sign in
         </button>
       </header>
+    </div><html lang="en">
+        {/* Header */}
 
-      <body className={inter.className}>{children}</body>
-    </html>
+
+        <body className={inter.className}>{children}</body>
+      </html></>
   );
 }

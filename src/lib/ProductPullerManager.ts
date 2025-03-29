@@ -1,6 +1,6 @@
 import mongoose, { Document, Model } from 'mongoose';
 
-// ========== 1) Mongoose Model (Optional) ==========
+// ========== 1) Mongoose Model ==========
 export interface IFactory extends Document {
   name: string;
   description?: string;
