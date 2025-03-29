@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db';
 import { User, initAdminUser } from '@/lib/schema';
 
+// This API route handles GET requests to fetch user data
 export async function GET() {
   console.log('Fetching admin data...');
-  
-  // Connect to the database
   
   try {
     await dbConnect();

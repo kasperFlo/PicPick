@@ -20,6 +20,7 @@ interface AdminData {
   wishlist: WishlistItem[];
 }
 
+// This is a client component that fetches user data from the API
 export default function UsersPage() {
   const [data, setData] = useState<AdminData | null>(null);
   const [loading, setLoading] = useState(true);
