@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/db';
-import { User, initAdminUser } from '@/lib/schema';
+import { dbConnect } from '@/lib/DB/db';
+import { User, initAdminUser } from '@/lib/DB/schema';
 
 // This API route handles GET requests to fetch user data
 export async function GET() {
@@ -26,6 +26,8 @@ export async function GET() {
     return NextResponse.json({
       user: {
         username: adminUser.username,
+        firstName: adminUser.firstName,
+        lastName: adminUser.lastName,
         email: adminUser.email,
         createdAt: adminUser.createdAt
       },
