@@ -10,6 +10,8 @@ export interface IWishlistItem {
 
 export interface IUser extends Document {
   username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   createdAt: Date;
@@ -28,6 +30,18 @@ const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: [true, "Username is required"],
+    unique: true,
+    trim: true,
+  },
+  firstName: {
+    type: String,
+    required: [true, "First Name is required"],
+    unique: true,
+    trim: true,
+  },
+  lastName: {
+    type: String,
+    required: [true, "Last Name is required"],
     unique: true,
     trim: true,
   },
@@ -59,10 +73,14 @@ export async function initAdminUser() {
   const adminExists = await User.findOne({ username: 'AdminTest' });
   
   if (!adminExists) {
+    console.log('Admin user not found, creating one...');
     await User.create({
       username: 'AdminTest',
       email: 'admin@example.com',
-      password: 'password123', // In production, use hashed passwords!
+      password: 'password123', // 
+      firstName: 'Admin',
+      lastName: 'User',
+      createdAt: new Date(),
       wishlist: [
         {
           name: 'Sony WH-1000XM4 Wireless Headphones',
