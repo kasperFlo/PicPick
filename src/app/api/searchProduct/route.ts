@@ -1,7 +1,7 @@
 // app/api/searchProduct/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { pullProductData } from '@/lib/ProductPullerFactory';
+import { pullProductData } from '@/lib/ProductPullerManager';
 
 // This API route handles GET requests to fetch product data from the factory
 export async function GET(request: NextRequest) {
