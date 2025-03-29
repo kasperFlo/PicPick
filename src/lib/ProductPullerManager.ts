@@ -1,6 +1,6 @@
 import mongoose, { Document, Model } from 'mongoose';
 
-// ========== 1) FACTORY SCHEMA & MODEL ==========
+// ========== 1) Mongoose Model (Optional) ==========
 export interface IFactory extends Document {
   name: string;
   description?: string;
@@ -12,18 +12,11 @@ const { Schema, model, models } = mongoose;
 
 const FactorySchema = new Schema<IFactory>(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      default: '',
-    },
+    name: { type: String, required: true, trim: true },
+    description: { type: String, default: '' },
   },
   {
-    timestamps: true // adds createdAt & updatedAt
+    timestamps: true,
   }
 );
 
@@ -33,94 +26,126 @@ const Factory: Model<IFactory> =
 export default Factory;
 
 
-// ========== 2) PRODUCT PULLER FUNCTION & INTERFACE ==========
+// ========== 2) PRODUCT LISTING INTERFACE ==========
 
-// Our unified interface for product data:
-export interface ProductResult {
-  source: string;       // e.g. "GoogleShopping", "Amazon", "BestBuy", etc.
-  title: string;        // Product name/title
-  price: number;        // Numeric price
-  link?: string;        // URL to product page
-  rating?: number;      // Average rating
-  reviews?: number;     // Number of reviews
-  description?: string; // Product description
+export interface ProductListingInfo {
+  name: string;                      // e.g. "Apple MacBook Pro 14-inch"
+  price: {
+    value: number;                   // e.g. 1499.99
+    currency: string;               // e.g. "USD"
+    formatted: string;              // e.g. "$1,499.99"
+  };
+  seller: string;                    // e.g. "Best Buy" or "Amazon"
+  platform: string;                  // e.g. "GoogleShopping", "Amazon", "BestBuy"
+  link: string;                      // product detail page
+  image: string;                     // main product image URL
+  rating?: {
+    value: number;                   // e.g. 4.7
+    count: number;                   // e.g. 120 (number of reviews)
+  };
+  shipping?: string;                 // e.g. "Free shipping"
+  condition?: string;               // e.g. "New" or "Refurbished"
 }
 
+
+// ========== 3) MAIN FUNCTION TO FETCH AGGREGATED LISTINGS ==========
+
 /**
- * pullProductData - Aggregates product data from multiple sources
- *                   and returns it in a standardized array format.
+ * fetchProductListings - Aggregates product data from multiple sources
+ * (Google, Amazon, BestBuy, etc.) and returns a standardized array of
+ * ProductListingInfo objects.
  *
- * @param query A product search term (e.g. "laptop" or "iphone 14")
- * @returns An array of product data from the integrated sources
+ * @param query - Search term (e.g. "macbook" or "iphone")
+ * @returns Promise<ProductListingInfo[]>
  */
-export async function pullProductData(query: string): Promise<ProductResult[]> {
+export async function fetchProductListings(
+  query: string
+): Promise<ProductListingInfo[]> {
   // 1) Call each source in parallel (these are placeholders):
-  const [googleProducts, bestBuyProducts, amazonProducts] = await Promise.all([
-    pullFromGoogleShopping(query),
+  const [googleData, amazonData, bestBuyData] = await Promise.all([
+    pullFromGoogle(query),
+    pullFromAmazon(query),
     pullFromBestBuy(query),
-    pullFromAmazon(query)
   ]);
 
-  // 2) Combine into a single array
-  const combined = [
-    ...googleProducts,
-    ...bestBuyProducts,
-    ...amazonProducts
-  ];
+  // 2) Combine into one array
+  const combined = [...googleData, ...amazonData, ...bestBuyData];
 
-  // 3) (Optional) sort or filter combined data if needed
+  // 3) Return sorted/filtered if needed, or just return combined as-is
   return combined;
 }
 
 
-// ========== 3) PLACEHOLDER FUNCTIONS FOR EXTERNAL APIS ==========
-// In real code, you'd replace these with actual fetch calls to each service.
+// ========== 4) PLACEHOLDER DATA FETCHERS ==========
+// In real code, these would fetch data from external APIs (GoogleShopping, Amazon, etc.)
+// and shape them into ProductListingInfo format.
 
-async function pullFromGoogleShopping(query: string): Promise<ProductResult[]> {
-  // Example: Call SerpApi or Google Shopping directly, parse real results
-  // For now, return a mock example
+async function pullFromGoogle(query: string): Promise<ProductListingInfo[]> {
+  // Example mock data:
   return [
     {
-      source: 'GoogleShopping',
-      title: `Mock Google result for: ${query}`,
-      price: 999.99,
-      link: 'https://google.com/shopping/some_product',
-      rating: 4.5,
-      reviews: 1023,
-      description: 'This is a mock description for a Google Shopping product.'
-    }
+      name: `Google Mock - ${query}`,
+      price: {
+        value: 899.99,
+        currency: 'USD',
+        formatted: '$899.99',
+      },
+      seller: 'BestDealz',
+      platform: 'GoogleShopping',
+      link: 'https://google.com/shopping/...',
+      image: 'https://via.placeholder.com/200x200?text=GoogleMock',
+      rating: {
+        value: 4.5,
+        count: 230,
+      },
+      shipping: 'Free shipping',
+      condition: 'New',
+    },
   ];
 }
 
-async function pullFromBestBuy(query: string): Promise<ProductResult[]> {
-  // Example: Call BestBuy API with your key, parse results
-  // For now, return a mock
+async function pullFromAmazon(query: string): Promise<ProductListingInfo[]> {
   return [
     {
-      source: 'BestBuy',
-      title: `Mock BestBuy result for: ${query}`,
-      price: 899.99,
-      link: 'https://bestbuy.com/product/123',
-      rating: 4.7,
-      reviews: 88,
-      description: 'Mock description for BestBuy product.'
-    }
+      name: `Amazon Mock - ${query}`,
+      price: {
+        value: 999.99,
+        currency: 'USD',
+        formatted: '$999.99',
+      },
+      seller: 'Amazon',
+      platform: 'Amazon',
+      link: 'https://amazon.com/dp/123ABC',
+      image: 'https://via.placeholder.com/200x200?text=AmazonMock',
+      rating: {
+        value: 4.2,
+        count: 512,
+      },
+      shipping: 'Free Prime Delivery',
+      condition: 'New',
+    },
   ];
 }
 
-async function pullFromAmazon(query: string): Promise<ProductResult[]> {
-  // Example: Call Amazon Product Advertising API, parse results
-  // For now, return a mock
+async function pullFromBestBuy(query: string): Promise<ProductListingInfo[]> {
   return [
     {
-      source: 'Amazon',
-      title: `Mock Amazon result for: ${query}`,
-      price: 949.99,
-      link: 'https://amazon.com/dp/B99999',
-      rating: 4.0,
-      reviews: 512,
-      description: 'Mock description for Amazon product.'
-    }
+      name: `BestBuy Mock - ${query}`,
+      price: {
+        value: 1099.99,
+        currency: 'USD',
+        formatted: '$1,099.99',
+      },
+      seller: 'Best Buy',
+      platform: 'BestBuy',
+      link: 'https://bestbuy.com/site/product/999',
+      image: 'https://via.placeholder.com/200x200?text=BestBuyMock',
+      rating: {
+        value: 4.7,
+        count: 74,
+      },
+      shipping: 'Standard shipping',
+      condition: 'New',
+    },
   ];
 }
-

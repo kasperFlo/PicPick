@@ -1,29 +1,24 @@
-// app/api/searchProduct/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
-import { pullProductData } from '@/lib/ProductPullerManager';
+import { fetchProductListings } from '@/lib/ProductPullerManager';
 
-// This API route handles GET requests to fetch product data from the factory
 export async function GET(request: NextRequest) {
   try {
-    // Extract the search query parameter: ?q=someSearchTerm
+    // 1) Grab ?q=someProduct from request
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || 'laptop';
 
-    console.log(`searchProduct/route.ts - Received query: ${query}`);
+    // 2) Call the aggregator to get standardized product listings
+    const listings = await fetchProductListings(query);
 
-    // Use our "factory" function to pull data from multiple sources
-    const results = await pullProductData(query);
-
-    // Return the combined product results in JSON
+    // 3) Return JSON
     return NextResponse.json({
       success: true,
-      data: results,
+      data: listings,
     });
   } catch (error) {
     console.error('Error in searchProduct route:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch products' },
+      { success: false, error: 'Failed to fetch product listings' },
       { status: 500 }
     );
   }
