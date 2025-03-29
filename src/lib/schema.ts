@@ -71,7 +71,9 @@ export async function initAdminUser() {
   await dbConnect();
   
   const adminExists = await User.findOne({ username: 'AdminTest' });
+  if (adminExists != null) console.log('Admin user exists:', adminExists);
   
+  // Check if the admin user already exists
   if (!adminExists) {
     console.log('Admin user not found, creating one...');
     await User.create({

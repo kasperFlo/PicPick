@@ -8,15 +8,16 @@ export async function GET() {
   
   try {
     await dbConnect();
+    
     // Initialize admin user if it doesn't exist
     await initAdminUser();
     
     // Find the admin user and return their data
-    const adminUser = await User.findOne({ username: 'AdminTest' })
+    const QueryUser = await User.findOne({ username: 'AdminTest' })
       .select('-password')
       .lean();
       
-    if (!adminUser) {
+    if (!QueryUser) {
       return NextResponse.json(
         { error: 'Admin user not found' },
         { status: 404 }
@@ -25,11 +26,13 @@ export async function GET() {
     
     return NextResponse.json({
       user: {
-        username: adminUser.username,
-        email: adminUser.email,
-        createdAt: adminUser.createdAt
+        username: QueryUser.username,
+        email: QueryUser.email,
+        firstName: QueryUser.firstName,
+        lastName: QueryUser.lastName,
+        createdAt: QueryUser.createdAt
       },
-      wishlist: adminUser.wishlist
+      wishlist: QueryUser.wishlist
     });
   } catch (error) {
     console.error('Error fetching admin data:', error);

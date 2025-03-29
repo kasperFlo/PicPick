@@ -31,13 +31,14 @@ export default function UsersPage() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const response = await fetch('/api/users');
+        const response = await fetch('/api/users'); // API route to fetch user data
         if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }
         const userData = await response.json();
         console.log('Fetched user data:', userData);
         setData(userData);
+        data && console.log('User data:', data.user.firstName , data.user.lastName);
       } catch (err) {
         setError('Failed to load user data');
         console.error(err);
@@ -56,7 +57,9 @@ export default function UsersPage() {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-        <h1 className="text-3xl font-bold mb-2">{data.user.username} : {data.user.firstName} {data.user.lastName} </h1>
+        <h1 className="text-3xl font-bold mb-2">
+          {data.user.username} : {data.user.lastName} {data.user.lastName}
+        </h1>
         <p className="text-gray-600 mb-4">{data.user.email}</p>
         <p className="text-sm text-gray-500">
           Account created: {new Date(data.user.createdAt).toLocaleDateString()}
