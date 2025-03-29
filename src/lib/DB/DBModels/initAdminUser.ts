@@ -1,5 +1,5 @@
 import User from './User';
-import { dbConnect } from '../db'; // adjust path if needed
+import { dbConnect } from '@/lib/DB/db'; // adjust path if needed
 
 export async function initAdminUser() {
   await dbConnect();
