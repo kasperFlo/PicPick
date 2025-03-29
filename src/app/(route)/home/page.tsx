@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { poppins, epilogue } from "@/lib/fonts";
 
 export default function HomePage() {
   const categories = [
@@ -49,17 +50,24 @@ export default function HomePage() {
     },
   ];
 
+  const handleCategoryClick = (category: string) => {
+    console.log(`Clicked on category: ${category}`);
+  };
+  const handleProductClick = (product: string) => {
+    console.log(`Clicked on product: ${product}`);
+  };
+
   return (
-    <div className="bg-black text-white min-h-screen font-sans">
+    <div className={`${poppins.variable} bg-[#EFF2F4] text-[#1E252B] min-h-screen font-sans`}>
       {/* Hero Section */}
-      <section className="flex flex-col md:flex-row items-center justify-between p-10 bg-black text-white">
+      <section className="flex flex-col md:flex-row items-center justify-between p-10 bg-[#053358] text-white">
         <div className="max-w-xl">
-          <h1 className="text-4xl font-bold mb-4 leading-snug">
+          <h1 className={`${epilogue.className} text-4xl font-bold mb-4 leading-snug`}>
             Search, compare, save
             <br />
             Find your next deal today
           </h1>
-          <p className="mb-6">
+          <p className="mb-6 font-poppins">
             At PriceRunner you can compare prices on{" "}
             <strong>8 million products</strong> from{" "}
             <strong>6,300 shops</strong>
@@ -68,9 +76,11 @@ export default function HomePage() {
             <input
               type="text"
               placeholder="What are you looking for today?"
-              className="p-3 flex-grow text-black focus:outline-none"
+              className="p-3 flex-grow text-[#333F49] focus:outline-none font-poppins"
             />
-            <button className="bg-black text-white px-5 py-3">→</button>
+            <button className="bg-[#2196F3] text-white px-5 py-3 hover:bg-[#0966AF] transition-colors">
+              →
+            </button>
           </div>
         </div>
         <div className="mt-10 md:mt-0 md:ml-10">
@@ -81,9 +91,8 @@ export default function HomePage() {
           />
         </div>
       </section>
-
       {/* Categories */}
-      <div className="flex flex-wrap justify-center gap-6 text-center p-4 text-sm bg-white text-black">
+      <div className="flex flex-wrap justify-center gap-6 text-center p-4 text-sm bg-white text-[#1E252B]">
         {categories.map((category) => (
           <div
             key={category.name}
@@ -98,28 +107,27 @@ export default function HomePage() {
           </div>
         ))}
       </div>
-
       {/* Popular Products */}
-      <section className="p-6 bg-white text-black">
-        <h2 className="text-xl font-semibold mb-4">
+      <section className="p-6 bg-white text-[#1E252B]">
+        <h2 className={`${epilogue.className} text-xl font-semibold mb-4`}>
           Popular products right now
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {products.map((item, idx) => (
             <div
               key={idx}
-              className="border p-4 rounded-lg shadow hover:shadow-lg bg-white text-black"
+              className="border border-[#E2E7EB] p-4 rounded-lg shadow hover:shadow-lg bg-white"
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="font-bold text-lg">{item.name}</h3>
-                  <p className="text-sm text-gray-500 flex items-center gap-1">
+                  <h3 className={`${epilogue.className} font-bold text-lg`}>{item.name}</h3>
+                  <p className="text-sm text-[#76BC9F] flex items-center gap-1">
                     <span>🧩</span> {item.category}
                   </p>
                 </div>
                 <span className="text-red-500 text-xl cursor-pointer">❤️</span>
               </div>
-              <div className="mb-4 h-36 bg-gray-100 flex items-center justify-center text-gray-400 text-2xl">
+              <div className="mb-4 h-36 bg-[#EFF2F4] flex items-center justify-center text-[#ACB9C5] text-2xl">
                 🖼 Image
               </div>
               {item.watchers > 0 && (
@@ -132,10 +140,10 @@ export default function HomePage() {
               )}
               <p className="font-bold text-lg">${item.price.toFixed(2)} CAD</p>
               <div className="flex gap-2 mt-3">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm flex items-center gap-1">
+                <button className="bg-[#2196F3] hover:bg-[#0966AF] text-white px-4 py-2 rounded-full text-sm flex items-center gap-1 transition-colors">
                   <span>👁️</span> See Details
                 </button>
-                <button className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full text-sm flex items-center gap-1">
+                <button className="bg-[#074C83] hover:bg-[#053358] text-white px-4 py-2 rounded-full text-sm flex items-center gap-1 transition-colors">
                   <span>🛒</span> Buy
                 </button>
               </div>

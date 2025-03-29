@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { poppins , epilogue} from '@/lib/fonts';
 
 // Define the structure of a product result
 type Product = {
