@@ -4,7 +4,7 @@ import { dbConnect } from '@/lib/DB/db';
 import ProductSearchResult from '@/lib/ProductAPI/ProductModels';
 import { fetchProductListings } from '@/lib/ProductPullerManager';
 
-// Sort helper: push any product.link that contains "amazon.com" to the bottom.
+// Helper to push amazon.com links to bottom
 function prioritizeDirectLinks(products: any[]) {
   const copy = [...products];
   copy.sort((a, b) => {
@@ -20,43 +20,45 @@ export async function GET(
   context: { params: Promise<{ itemQuery?: string }> }
 ) {
   try {
+    // 1) Connect to MongoDB
     await dbConnect();
 
+    // 2) Parse route param + query string
     const { itemQuery } = await context.params;
     const { searchParams } = new URL(request.url);
     const queryFromURL = searchParams.get('q');
     const queryString = itemQuery || queryFromURL || 'laptop';
 
-    // Check cache
+    // 3) Check the cache
     const existingResults = await ProductSearchResult.findOne({
-      query: { $regex: new RegExp(queryString, 'i') },
+      query: { $regex: new RegExp(queryString, 'i') }
     }).sort({ createdAt: -1 });
 
+    // If cache is found, sort and return
     if (existingResults) {
       const sortedCache = prioritizeDirectLinks(existingResults.results);
       return NextResponse.json({
         success: true,
         data: sortedCache,
-        source: 'cache',
+        source: 'cache'
       });
     }
 
-    // If no cache, fetch new results
+    // 4) If no cache, call aggregator (which may hit SerpApi)
     const listings = await fetchProductListings(queryString);
 
-    // Sort so Amazon fallback links go last
+    // 5) Sort the new results
     const sortedListings = prioritizeDirectLinks(listings);
 
-    // Remove old entry if it exists
+    // 6) Remove old entry (if any), then save new
     await ProductSearchResult.deleteOne({ query: queryString });
-
-    // Create new entry
     await ProductSearchResult.create({ query: queryString, results: sortedListings });
 
+    // 7) Return fresh, sorted results
     return NextResponse.json({
       success: true,
       data: sortedListings,
-      source: 'new',
+      source: 'new'
     });
 
     /* ==== used when new searches are disabled ====
