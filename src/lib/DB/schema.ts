@@ -66,7 +66,6 @@ const UserSchema = new mongoose.Schema({
 // Create or get the User model
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
-
 // ============ 2) FACTORY INTERFACES & SCHEMA ============ //
 
 export interface IFactory extends Document {
