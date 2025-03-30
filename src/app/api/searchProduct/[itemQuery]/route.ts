@@ -3,16 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/DB/db';
 import ProductSearchResult from '@/lib/ProductAPI/ProductModels';
-/**
- * This API route handles GET requests like:
- *    GET /api/searchProduct?q=macbook
- * 
- * It first checks MongoDB for existing results.
- * New searches are currently disabled.
- */
-export async function GET(request: NextRequest, { params }: { params: { itemQuery: string } }) {
-  try {
-    console.log('Running searchProduct API endpoint');
+import { fetchProductListings } from '@/lib/ProductPullerManager';
 
 // Sort helper: push any product.link that contains "amazon.com" to the bottom.
 function prioritizeDirectLinks(products: any[]) {
