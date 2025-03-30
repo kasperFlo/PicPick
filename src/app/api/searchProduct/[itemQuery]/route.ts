@@ -1,5 +1,6 @@
+// File: /app/api/searchProduct/[itemQuery]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchProductListings } from '@/lib/ProductPullerManager';
 import { dbConnect } from '@/lib/DB/db';
 import ProductSearchResult from '@/lib/ProductAPI/ProductModels';
 /**
@@ -11,7 +12,7 @@ import ProductSearchResult from '@/lib/ProductAPI/ProductModels';
  */
 export async function GET(request: NextRequest, { params }: { params: { itemQuery: string } }) {
   try {
-    // Connect to MongoDB
+    console.log('Running searchProduct API endpoint');
 
     console.log('Running searchProduct API...');
 
@@ -19,22 +20,24 @@ export async function GET(request: NextRequest, { params }: { params: { itemQuer
 
     await dbConnect();
 
-    // Get query from URL params or route params
+    // 2) Await context.params in Next.js 13 for dynamic routes
+    const { itemQuery } = await context.params;
+
+    // 3) Also parse query string ?q=
     const { searchParams } = new URL(request.url);
-    const { itemQuery } = await params;
-    const query = itemQuery || searchParams.get('q') || 'laptop';
+    const queryFromURL = searchParams.get('q');
 
-    const queryString = Array.isArray(query) ? query[0] : query;
+    // 4) Final query string: prefer route param over ?q=, fallback to "laptop"
+    const queryString = itemQuery || queryFromURL || 'laptop';
+    console.log(`Searching for: ${queryString}`);
 
-    console.log(`Searching for: ${query}`);
-
-    // Check if we already have results for this query in MongoDB
-    const existingResults = await ProductSearchResult.findOne({ 
-      query: { $regex: new RegExp(queryString, 'i') } 
+    // 5) Check if we already have results in MongoDB (case-insensitive)
+    const existingResults = await ProductSearchResult.findOne({
+      query: { $regex: new RegExp(queryString, 'i') }
     }).sort({ createdAt: -1 });
 
     if (existingResults) {
-      console.log(`Found existing results for query: ${query}`);
+      console.log(`Found existing results for query: ${queryString}`);
       return NextResponse.json({
         success: true,
         data: existingResults.results,
@@ -42,31 +45,24 @@ export async function GET(request: NextRequest, { params }: { params: { itemQuer
       });
     }
 
-    // This code is disabled but kept for future use
-    
-    // This function is in ProductPullerManager.ts
-    // It merges results from SerpApi (and possibly others later).
-    const listings = await fetchProductListings(query);
+    // 6) If no cache entry, call our aggregator from ProductPullerManager
+    const listings = await fetchProductListings(queryString);
 
-    // Save the search query and its results to MongoDB
-    console.log("saving to db")
-    await ProductSearchResult.create({ query, results: listings });
+    // 7) Save new results to MongoDB
+    console.log('Saving to DB');
+    const oldEntry = await ProductSearchResult.findOne({ query: queryString });
+    if (oldEntry) {
+      console.log(`Removing old results for query: ${queryString}`);
+      await ProductSearchResult.deleteOne({ query: queryString });
+    }
+    await ProductSearchResult.create({ query: queryString, results: listings });
 
+    // 8) Return fresh results
     return NextResponse.json({
       success: true,
       data: listings,
       source: 'new'
     });
-    
-/*
-    // New searches are disabled for now
-    console.log('New searches are currently disabled');
-    return NextResponse.json({
-      success: false,
-      error: 'New searches are temporarily disabled. Please try an existing query.',
-      source: 'error'
-    }, { status: 503 });
-*/
 
   } catch (error) {
     console.error('Error in searchProduct route:', error);
