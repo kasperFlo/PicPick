@@ -1,4 +1,6 @@
-// Define the interface for your product listing information
+// File: /src/lib/ProductAPI/ProductModels.ts
+import mongoose, { Document, Model } from 'mongoose';
+
 export interface ProductListingInfo {
   name: string;
   price: {
@@ -18,20 +20,18 @@ export interface ProductListingInfo {
   condition?: string;
 }
 
-// ------------------
-// New code to store search results in MongoDB
-import mongoose, { Document, Model } from 'mongoose';
-
+// For your MongoDB usage:
 export interface IProductSearchResult extends Document {
   query: string;
   results: ProductListingInfo[];
   createdAt: Date;
 }
 
+// Example Mongoose schema for caching search results
 const ProductSearchResultSchema = new mongoose.Schema({
   query: { type: String, required: true },
   results: { type: Array, required: true },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
 });
 
 const ProductSearchResult: Model<IProductSearchResult> =
@@ -39,4 +39,3 @@ const ProductSearchResult: Model<IProductSearchResult> =
   mongoose.model<IProductSearchResult>('ProductSearchResult', ProductSearchResultSchema);
 
 export default ProductSearchResult;
-

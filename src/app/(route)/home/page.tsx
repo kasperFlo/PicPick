@@ -1,9 +1,14 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation"; // for routing in a client component
 import { poppins, epilogue } from "@/lib/fonts";
 
 export default function HomePage() {
+  // 1) Next.js router for client-side navigation
+  const router = useRouter();
+
+  // 2) Categories array (icon images assumed stored in /public/icons/ folder)
   const categories = [
     { name: "Home", icon: "home.png" },
     { name: "Garden", icon: "sprout.png" },
@@ -19,6 +24,7 @@ export default function HomePage() {
     { name: "Sports", icon: "basketball.png" },
   ];
 
+  // 3) Products array
   const products = [
     {
       name: "iPhone 15 Pro",
@@ -50,19 +56,28 @@ export default function HomePage() {
     },
   ];
 
-  const handleCategoryClick = (category: string) => {
-    console.log(`Clicked on category: ${category}`);
+  // 4) Handle a category click -> go to "/search?q=CategoryName"
+  const handleCategoryClick = (categoryName: string) => {
+    console.log(`Clicked category: ${categoryName}`);
+    router.push(`/search?q=${encodeURIComponent(categoryName)}`);
   };
-  const handleProductClick = (product: string) => {
-    console.log(`Clicked on product: ${product}`);
+
+  // 5) Handle a product click -> go to "/search?q=ProductName"
+  const handleProductClick = (productName: string) => {
+    console.log(`Clicked product: ${productName}`);
+    router.push(`/search?q=${encodeURIComponent(productName)}`);
   };
 
   return (
-    <div className={`${poppins.variable} bg-[#EFF2F4] text-[#1E252B] min-h-screen font-sans`}>
+    <div
+      className={`${poppins.variable} bg-[#EFF2F4] text-[#1E252B] min-h-screen font-sans`}
+    >
       {/* Hero Section */}
       <section className="flex flex-col md:flex-row items-center justify-between p-10 bg-[#053358] text-white">
         <div className="max-w-xl">
-          <h1 className={`${epilogue.className} text-4xl font-bold mb-4 leading-snug`}>
+          <h1
+            className={`${epilogue.className} text-4xl font-bold mb-4 leading-snug`}
+          >
             Search, compare, save
             <br />
             Find your next deal today
@@ -91,12 +106,14 @@ export default function HomePage() {
           />
         </div>
       </section>
+
       {/* Categories */}
       <div className="flex flex-wrap justify-center gap-6 text-center p-4 text-sm bg-white text-[#1E252B]">
         {categories.map((category) => (
           <div
             key={category.name}
             className="cursor-pointer flex flex-col items-center hover:scale-110 transition-transform duration-200 w-20"
+            onClick={() => handleCategoryClick(category.name)} // <-- here's the click
           >
             <img
               src={`/icons/${category.icon}`}
@@ -107,6 +124,7 @@ export default function HomePage() {
           </div>
         ))}
       </div>
+
       {/* Popular Products */}
       <section className="p-6 bg-white text-[#1E252B]">
         <h2 className={`${epilogue.className} text-xl font-semibold mb-4`}>
@@ -120,7 +138,9 @@ export default function HomePage() {
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className={`${epilogue.className} font-bold text-lg`}>{item.name}</h3>
+                  <h3 className={`${epilogue.className} font-bold text-lg`}>
+                    {item.name}
+                  </h3>
                   <p className="text-sm text-[#76BC9F] flex items-center gap-1">
                     <span>🧩</span> {item.category}
                   </p>
@@ -140,7 +160,11 @@ export default function HomePage() {
               )}
               <p className="font-bold text-lg">${item.price.toFixed(2)} CAD</p>
               <div className="flex gap-2 mt-3">
-                <button className="bg-[#2196F3] hover:bg-[#0966AF] text-white px-4 py-2 rounded-full text-sm flex items-center gap-1 transition-colors">
+                {/* “See Details” -> triggers handleProductClick */}
+                <button
+                  onClick={() => handleProductClick(item.name)}
+                  className="bg-[#2196F3] hover:bg-[#0966AF] text-white px-4 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
+                >
                   <span>👁️</span> See Details
                 </button>
                 <button className="bg-[#074C83] hover:bg-[#053358] text-white px-4 py-2 rounded-full text-sm flex items-center gap-1 transition-colors">

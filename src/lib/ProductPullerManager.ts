@@ -2,32 +2,12 @@
 
 import { ProductListingInfo } from './ProductAPI/ProductModels';
 
-
-/**
- * ========== fetchProductListings ==========
- * Main aggregator function. Right now it only calls pullFromGoogle(),
- * but you could add other sources in parallel if you like.
- */
 export async function fetchProductListings(query: string): Promise<ProductListingInfo[]> {
-  // For example, you might have multiple data sources:
-  // const [googleData, someOtherData] = await Promise.all([
-  //   pullFromGoogle(query),
-  //   pullFromSomeOtherAPI(query),
-  // ]);
-  // return [...googleData, ...someOtherData];
-
+  // For now, only SerpApi / Google
   const googleData = await pullFromGoogle(query);
   return googleData;
 }
 
-/**
- * ========== pullFromGoogle ==========
- * 1) Calls SerpApi's Google Shopping endpoint with direct_link=true
- * 2) Retries once if we get 429 (Too Many Requests)
- * 3) Maps results into ProductListingInfo
- * 4) If a link is still going to any google.* domain, tries sub-fields,
- *    then falls back to Amazon
- */
 async function pullFromGoogle(query: string): Promise<ProductListingInfo[]> {
   const serpApiKey = process.env.SERPAPI_KEY;
   if (!serpApiKey) {
@@ -39,19 +19,17 @@ async function pullFromGoogle(query: string): Promise<ProductListingInfo[]> {
   url.searchParams.set('engine', 'google_shopping');
   url.searchParams.set('q', query);
   url.searchParams.set('api_key', serpApiKey);
-  url.searchParams.set('direct_link', 'true'); // request direct store links if available
+  url.searchParams.set('direct_link', 'true');
 
-  console.log(`pullFromGoogle() -> ${url.toString()}`);
+  console.log(`\n[PullFromGoogle] => ${url.toString()}`);
 
   try {
-    // 1) Fetch from SerpApi
     let response = await fetch(url.toString(), { method: 'GET' });
 
-    // 2) If we get 429, wait 5 seconds and retry once
+    // Retry once if 429
     if (response.status === 429) {
       console.warn('Got 429 from SerpApi, waiting 5s then retrying once...');
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-
+      await new Promise((res) => setTimeout(res, 5000));
       response = await fetch(url.toString(), { method: 'GET' });
       if (response.status === 429) {
         console.error('Still 429 after retry; returning empty array.');
@@ -65,8 +43,11 @@ async function pullFromGoogle(query: string): Promise<ProductListingInfo[]> {
     }
 
     const data = await response.json();
-    return parseSerpApiResponse(data);
 
+    // Pass to the parser function
+    const results = parseSerpApiResponse(data);
+    console.log(`[PullFromGoogle] => Got ${results.length} results from SerpApi.\n`);
+    return results;
   } catch (error) {
     console.error('Error in pullFromGoogle:', error);
     return [];
@@ -74,32 +55,30 @@ async function pullFromGoogle(query: string): Promise<ProductListingInfo[]> {
 }
 
 /**
- * ========== parseSerpApiResponse ==========
- *  - Collects results from shopping_results, inline_shopping_results, featured_shopping_results
- *  - Checks multiple sub-fields (sellers, buying_options, inline_seller_listings) for direct store links
- *  - Falls back to Amazon if the link is still a Google domain
+ * Merges SerpApi arrays, checks sub-fields, tries to parse google redirect,
+ * and logs final link choices. Fallback to Amazon if domain is still google.
  */
 function parseSerpApiResponse(data: any): ProductListingInfo[] {
-  // Merge all relevant arrays from the SerpApi JSON
   const rawShopping = data.shopping_results ?? [];
   const rawInline = data.inline_shopping_results ?? [];
   const rawFeatured = data.featured_shopping_results ?? [];
   const combined = [...rawShopping, ...rawInline, ...rawFeatured];
 
-  return combined.map((item: any) => {
-    // Basic name & brand
+  console.log(`[parseSerpApiResponse] => rawShopping: ${rawShopping.length}, rawInline: ${rawInline.length}, rawFeatured: ${rawFeatured.length}\n`);
+
+  return combined.map((item: any, idx: number) => {
+    // Basic details
     const name = item.title ?? 'No Title';
     const brand = item.brand ?? '';
-    const combinedName = brand && !name.toLowerCase().includes(brand.toLowerCase())
-      ? `${brand} ${name}`.trim()
-      : name;
+    const combinedName =
+      brand && !name.toLowerCase().includes(brand.toLowerCase())
+        ? `${brand} ${name}`.trim()
+        : name;
 
-    // Price
     const extractedPrice = item.extracted_price ?? 0;
     const rawPriceString = item.price ?? `$${extractedPrice}`;
     const currency = rawPriceString.includes('$') ? 'USD' : 'CAD';
 
-    // Other fields
     const seller = item.source || 'Unknown Seller';
     const ratingValue = item.rating ?? 0;
     const ratingCount = item.reviews ?? 0;
@@ -110,7 +89,10 @@ function parseSerpApiResponse(data: any): ProductListingInfo[] {
     // Start with product_link or link
     let finalLink = item.product_link || item.link || '';
 
-    // Check if finalLink is a Google domain
+    // For debugging
+    let debugLog = `[Item #${idx}] => name="${name}", brand="${brand}"\n  initialLink="${finalLink}"`;
+
+    // Helper
     function isGoogleDomain(urlString: string): boolean {
       try {
         const parsed = new URL(urlString);
@@ -120,27 +102,25 @@ function parseSerpApiResponse(data: any): ProductListingInfo[] {
       }
     }
 
-    // 1) If finalLink is still google or empty, check item.sellers
+    // 1) If finalLink is google or empty, check subfields
     if (!finalLink || isGoogleDomain(finalLink)) {
       if (Array.isArray(item.sellers) && item.sellers.length > 0) {
         const potentialSellerLink = item.sellers[0].link;
         if (potentialSellerLink && !isGoogleDomain(potentialSellerLink)) {
           finalLink = potentialSellerLink;
+          debugLog += `\n  -> Used sellers[0].link="${finalLink}"`;
         }
       }
     }
-
-    // 2) If still google or empty, check item.buying_options
     if (!finalLink || isGoogleDomain(finalLink)) {
       if (Array.isArray(item.buying_options) && item.buying_options.length > 0) {
         const buyOptLink = item.buying_options[0].link;
         if (buyOptLink && !isGoogleDomain(buyOptLink)) {
           finalLink = buyOptLink;
+          debugLog += `\n  -> Used buying_options[0].link="${finalLink}"`;
         }
       }
     }
-
-    // 3) If still google or empty, check item.inline_seller_listings
     if (!finalLink || isGoogleDomain(finalLink)) {
       if (
         Array.isArray(item.inline_seller_listings) &&
@@ -149,25 +129,32 @@ function parseSerpApiResponse(data: any): ProductListingInfo[] {
         const inlineLink = item.inline_seller_listings[0].link;
         if (inlineLink && !isGoogleDomain(inlineLink)) {
           finalLink = inlineLink;
+          debugLog += `\n  -> Used inline_seller_listings[0].link="${finalLink}"`;
         }
       }
     }
 
-    // 4) If STILL google or empty, fallback to Amazon with brand + name
-    if (
-      !finalLink ||
-      finalLink.includes('google.com') ||
-      finalLink.includes('googleadservices.com') ||
-      finalLink.includes('google.') || // for google.ca, google.co.uk, etc.
-      finalLink.includes('google') 
-    ) {
-      finalLink = `https://www.amazon.com/s?k=${encodeURIComponent(name)}`;
+    // 2) If still google, parse out real link in param
+    if (isGoogleDomain(finalLink)) {
+      const possibleRealLink = extractStoreLinkFromGoogleRedirect(finalLink);
+      if (possibleRealLink && !isGoogleDomain(possibleRealLink)) {
+        finalLink = possibleRealLink;
+        debugLog += `\n  -> Extracted from Google redirect param: "${finalLink}"`;
+      }
     }
-    
 
-    // Construct the final ProductListingInfo
-    const product: ProductListingInfo = {
-      name: combinedName, // brand + title if distinct
+    // 3) If STILL google or empty => Amazon fallback
+    if (!finalLink || isGoogleDomain(finalLink)) {
+      debugLog += `\n  => Fallback to Amazon search for "${combinedName}"`;
+      finalLink = `https://www.amazon.com/s?k=${encodeURIComponent(combinedName)}`;
+    }
+
+    debugLog += `\n  finalLink="${finalLink}"\n`;
+    console.log(debugLog);
+
+    // Build the final ProductListingInfo
+    return {
+      name: combinedName,
       price: {
         value: extractedPrice,
         currency,
@@ -181,8 +168,24 @@ function parseSerpApiResponse(data: any): ProductListingInfo[] {
       shipping,
       condition,
     };
-
-    return product;
   });
 }
 
+/** 
+ * Attempt to parse store link from google.com/url?url=... or adurl=..., etc.
+ */
+function extractStoreLinkFromGoogleRedirect(googleUrl: string): string | null {
+  try {
+    const parsed = new URL(googleUrl);
+    const candidateParams = ['url', 'adurl', 'q'];
+    for (const paramKey of candidateParams) {
+      const paramVal = parsed.searchParams.get(paramKey);
+      if (paramVal) {
+        return decodeURIComponent(paramVal);
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
