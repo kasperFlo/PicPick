@@ -5,8 +5,27 @@ import { dbConnect } from "@/lib/DB/db";
 import ProductSearchResult from "@/lib/ProductAPI/ProductModels";
 import { fetchProductListings } from "@/lib/ProductPullerManager";
 
+interface Product {
+  name: string;
+  link: string;
+  price: {
+    value: number;
+    formatted: string;
+    currency: string;
+  };
+  platform: string;
+  seller: string;
+  image?: string;
+  rating?: {
+    value: number;
+    count: number;
+  };
+  shipping?: string;
+  condition?: string;
+}
+
 /** Sort helper: push amazon.com links to the bottom */
-function prioritizeDirectLinks(products: any[]) {
+function prioritizeDirectLinks(products: Product[]) {
   const copy = [...products];
   copy.sort((a, b) => {
     const aIsAmazon = a.link.includes("amazon.com") ? 1 : 0;
@@ -69,6 +88,7 @@ export async function GET(
     */
 
   } catch (error) {
+    console.error("Error fetching product listings:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch product listings" },
       { status: 500 }

@@ -29,7 +29,7 @@ export default function CategoryPage() {
     // Save slug to localStorage => used by home page
     try {
       const stored = localStorage.getItem("visitedCategories");
-      let visited: string[] = stored ? JSON.parse(stored) : [];
+      const visited: string[] = stored ? JSON.parse(stored) : [];
       if (!visited.includes(slug)) {
         visited.push(slug);
       }
@@ -51,6 +51,7 @@ export default function CategoryPage() {
         }
       } catch (err) {
         setError("Error fetching products");
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -75,7 +76,7 @@ export default function CategoryPage() {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Category: {slug}</h1>
 
-      {loading && <p>Loading products for "{slug}"...</p>}
+      {loading && <p>Loading products for &quot{slug}&quot...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

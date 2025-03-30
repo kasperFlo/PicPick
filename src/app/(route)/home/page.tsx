@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { poppins, epilogue } from "@/lib/fonts";
+// import { poppins, epilogue } from "@/lib/fonts";
 import { Product } from "@/app/types/Product";
 
 export default function HomePage() {
@@ -95,6 +95,7 @@ export default function HomePage() {
         }
       } catch (err) {
         setPopError("Error fetching popular products");
+        console.error(err);
       } finally {
         setPopLoading(false);
       }

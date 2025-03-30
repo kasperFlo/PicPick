@@ -309,7 +309,7 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
             checked={filters.deals.today}
             onChange={(e) => handleDealsChange(e.target.checked)}
           />
-          <label htmlFor="deals">Today's Deals</label>
+          <label htmlFor="deals">Today&quots Deals</label>
         </div>
       </div>
     </div>

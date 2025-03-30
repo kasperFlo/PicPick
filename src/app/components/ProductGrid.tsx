@@ -1,5 +1,5 @@
 import React from "react";
-import { epilogue } from '@/lib/fonts';
+// import { epilogue } from '@/lib/fonts';
 import ProductCard from "@/app/components/ProductCard";
 import { Product } from "@/app/types/Product";
 

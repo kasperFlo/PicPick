@@ -9,7 +9,7 @@ import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
   const router = useRouter();
-  const { searchQuery, setSearchQuery } = useSearch();
+  const { setSearchQuery } = useSearch();
   const [query, setQuery] = useState("");
   const { data: session } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);

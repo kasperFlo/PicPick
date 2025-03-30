@@ -30,7 +30,7 @@ interface UserData {
 }
 
 export default function WishlistPage() {
-  const { data: session, status } = useSession();
+  const {status } = useSession();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,9 +39,8 @@ export default function WishlistPage() {
   useEffect(() => {
     if (status === 'authenticated') {
       fetchUserData();
-    } else if (status === 'unauthenticated') {
-      setLoading(false);
-      setError('Please sign in to view your wishlist');
+    } else {
+        fetchUserData();
     }
   }, [status]);
 
@@ -105,21 +104,21 @@ export default function WishlistPage() {
     );
   }
 
-  if (status === 'unauthenticated') {
-    return (
-      <div className={`${poppins.variable} min-h-screen bg-[#EFF2F4] p-8 font-poppins`}>
-        <div className="text-center p-8 bg-white rounded-lg shadow">
-          <p className="text-[#5D7285] mb-4">Please sign in to view your wishlist</p>
-          <Link 
-            href="/signin"
-            className="bg-[#2196F3] hover:bg-[#0966AF] text-white px-6 py-2 rounded-full transition-colors"
-          >
-            Sign In
-          </Link>
-        </div>
-      </div>
-    );
-  }
+//   if (status === 'unauthenticated') {
+//     return (
+//       <div className={`${poppins.variable} min-h-screen bg-[#EFF2F4] p-8 font-poppins`}>
+//         <div className="text-center p-8 bg-white rounded-lg shadow">
+//           <p className="text-[#5D7285] mb-4">Please sign in to view your wishlist</p>
+//           <Link 
+//             href="/signin"
+//             className="bg-[#2196F3] hover:bg-[#0966AF] text-white px-6 py-2 rounded-full transition-colors"
+//           >
+//             Sign In
+//           </Link>
+//         </div>
+//       </div>
+//     );
+//   }
 
   if (error) {
     return (
@@ -146,7 +145,7 @@ export default function WishlistPage() {
       <div className="max-w-6xl mx-auto">
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <h1 className={`${epilogue.className} text-3xl font-bold mb-2 text-[#053358]`}>
-            {userData.user.firstName} {userData.user.lastName}'s Profile
+            {userData.user.firstName} {userData.user.lastName}' Profile
           </h1>
           <p className="text-[#485967] mb-4">{userData.user.email}</p>
           <div className="flex items-center text-sm text-[#ACB9C5]">

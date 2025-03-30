@@ -15,7 +15,7 @@ import NoValidState from "@/app/components/Ui/NoValidState";
 import { Product } from "@/app/types/Product";
 
 export default function SearchPage() {
-  const { searchQuery, setSearchQuery } = useSearch();
+  const {setSearchQuery } = useSearch();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState<string>(searchParams.get("q") || "");
   const [results, setResults] = useState<Product[]>([]);
@@ -136,7 +136,7 @@ export default function SearchPage() {
       filters.brands.ebay
     ) {
       filtered = filtered.filter((product) => {
-        const platform = product.platform.toLowerCase();
+        const platform = product.seller.toLowerCase();
         if (filters.brands.walmart && platform.includes("walmart")) return true;
         if (filters.brands.amazon && platform.includes("amazon")) return true;
         if (filters.brands.bestBuy && platform.includes("best buy"))
@@ -230,29 +230,29 @@ export default function SearchPage() {
     }
   };
 
-  const getSortedProducts = () => {
-    if (!sortOption || results.length === 0) return results;
+  // const getSortedProducts = () => {
+  //   if (!sortOption || results.length === 0) return results;
 
-    const sortedProducts = [...results];
+  //   const sortedProducts = [...results];
 
-    switch (sortOption) {
-      case "price_high_low":
-        return sortedProducts.sort((a, b) => b.price.value - a.price.value);
-      case "price_low_high":
-        return sortedProducts.sort((a, b) => a.price.value - b.price.value);
-      case "newest":
-        // Assuming you have a date field, otherwise you'll need to add one
-        return sortedProducts; // For now, just return unsorted
-      case "rating":
-        return sortedProducts.sort((a, b) => {
-          const ratingA = a.rating?.value || 0;
-          const ratingB = b.rating?.value || 0;
-          return ratingB - ratingA;
-        });
-      default:
-        return sortedProducts;
-    }
-  };
+  //   switch (sortOption) {
+  //     case "price_high_low":
+  //       return sortedProducts.sort((a, b) => b.price.value - a.price.value);
+  //     case "price_low_high":
+  //       return sortedProducts.sort((a, b) => a.price.value - b.price.value);
+  //     case "newest":
+  //       // Assuming you have a date field, otherwise you'll need to add one
+  //       return sortedProducts; // For now, just return unsorted
+  //     case "rating":
+  //       return sortedProducts.sort((a, b) => {
+  //         const ratingA = a.rating?.value || 0;
+  //         const ratingB = b.rating?.value || 0;
+  //         return ratingB - ratingA;
+  //       });
+  //     default:
+  //       return sortedProducts;
+  //   }
+  // };
 
   return (
     <div
@@ -288,7 +288,7 @@ export default function SearchPage() {
               filters={filters}
               onFilterChange={handleFilterChange}
             />
-          </div>
+          </div>  
 
           <div className="flex-1">
             {getFilteredAndSortedProducts().length > 0 ? (
