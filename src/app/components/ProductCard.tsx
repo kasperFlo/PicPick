@@ -1,5 +1,7 @@
+// File: /src/app/components/ProductCard.tsx
+
 import React from "react";
-import { epilogue } from '@/lib/fonts';
+import { epilogue } from "@/lib/fonts";
 import { Product } from "@/app/types/Product";
 
 type ProductCardProps = {
