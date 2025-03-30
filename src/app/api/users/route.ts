@@ -21,9 +21,9 @@ export async function GET() {
     await dbConnect();
     
     // Find the current user by ID from session
-    const currentUser = await User.findById(session.user.id)
-      .select('-password')  // exclude password
-      .lean();
+    const currentUser = await User.findOne({ username: 'AdminTest' })
+    .select('-password')  // exclude password
+    .lean();
       
     if (!currentUser) {
       return NextResponse.json(

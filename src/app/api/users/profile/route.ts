@@ -1,46 +1,43 @@
-// app/api/user/profile/route.ts
 import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/DB/db';
-import { User } from '@/lib/DB/schema';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { User, initAdminUser } from '@/lib/DB/schema';
 
 export async function GET() {
-  console.log('Fetching user profile data...');
+  console.log('Fetching admin data...');
+  
+  // Connect to the database
   
   try {
-    const session = await getServerSession(authOptions);
-    
     await dbConnect();
-    console.log('Connected to database');
-    console.log('Fetching user')
+    // Initialize admin user if it doesn't exist
+    await initAdminUser();
     
-    // Find the current user by ID from session
-    const currentUser = await User.findById('AdminTest')
-      .select('-password')  // exclude password
+    // Find the admin user and return their data
+    const adminUser = await User.findOne({ username: 'AdminTest' })
+      .select('-password')
       .lean();
       
-    if (!currentUser) {
-      console.log('User not found');
+    if (!adminUser) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'Admin user not found' },
         { status: 404 }
       );
     }
+    
     return NextResponse.json({
       user: {
-        username: currentUser.username,
-        firstName: currentUser.firstName,
-        lastName: currentUser.lastName,
-        email: currentUser.email,
-        createdAt: currentUser.createdAt
+        username: adminUser.username,
+        firstName: adminUser.firstName,
+        lastName: adminUser.lastName,
+        email: adminUser.email,
+        createdAt: adminUser.createdAt
       },
-      wishlist: currentUser.wishlist || []
+      wishlist: adminUser.wishlist
     });
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    console.error('Error fetching admin data:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch user profile' },
+      { error: 'Failed to fetch admin data' },
       { status: 500 }
     );
   }
