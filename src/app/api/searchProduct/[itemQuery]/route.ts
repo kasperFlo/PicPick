@@ -57,6 +57,17 @@ export async function GET(
       data: sortedListings,
       source: "new",
     });
+
+    /* ==== used when new searches are disabled ====
+        // New searches are disabled for now
+        console.log('New searches are currently disabled');
+        return NextResponse.json({
+          success: false,
+          error: 'New searches are temporarily disabled. Please try an existing query.',
+          source: 'error'
+        }, { status: 503 });
+    */
+
   } catch (error) {
     return NextResponse.json(
       { success: false, error: "Failed to fetch product listings" },
