@@ -9,8 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "mongoose": "^8.13.1",
     "next": "15.2.4",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -25,12 +28,12 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  
-    "compilerOptions": {
-      "baseUrl": "./",
-      "paths": {
-        "@/*": ["src/*"]
-      }
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
     }
-  
+  }
 }
