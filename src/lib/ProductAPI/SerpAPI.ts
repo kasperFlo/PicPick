@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ProductListingInfo } from './ProductModels';
 
 export async function GET(request: NextRequest) {
   console.log('Fetching data from Google Shopping (SerpApi)...');

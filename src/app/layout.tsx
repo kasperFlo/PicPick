@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { poppins } from "@/lib/fonts";
 import Header from "@/app/components/header";
+import { SearchProvider} from '@/app/contexts/SearchContext';
 
 export const metadata: Metadata = {
   title: "Shopping Platform",
@@ -14,8 +15,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+
     <html lang="en">
       <body className={`${poppins.className} bg-white`}>
+        <SearchProvider>
         <div className="min-h-screen flex flex-col">
           <Header /> {/* ✅ Use Header with mobile nav toggle */}
           <main className="flex-grow">{children}</main>
@@ -39,6 +42,7 @@ export default function RootLayout({
             </p>
           </footer>
         </div>
+        </SearchProvider>
       </body>
     </html>
   );
