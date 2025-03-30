@@ -43,12 +43,13 @@ export async function GET(request: NextRequest, { params }: { params: { itemQuer
     }
 
     // This code is disabled but kept for future use
-    /*
+    
     // This function is in ProductPullerManager.ts
     // It merges results from SerpApi (and possibly others later).
     const listings = await fetchProductListings(query);
 
     // Save the search query and its results to MongoDB
+    console.log("saving to db")
     await ProductSearchResult.create({ query, results: listings });
 
     return NextResponse.json({
@@ -56,8 +57,8 @@ export async function GET(request: NextRequest, { params }: { params: { itemQuer
       data: listings,
       source: 'new'
     });
-    */
-
+    
+/*
     // New searches are disabled for now
     console.log('New searches are currently disabled');
     return NextResponse.json({
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest, { params }: { params: { itemQuer
       error: 'New searches are temporarily disabled. Please try an existing query.',
       source: 'error'
     }, { status: 503 });
-
+*/
 
   } catch (error) {
     console.error('Error in searchProduct route:', error);
