@@ -25,65 +25,65 @@ export default function HomePage() {
 
   // ========== Categories (with subcategories) ==========
   const categories = [
-    { 
-      name: "Home", 
-      icon: "home.png", 
-      subcategories: ["Furniture", "Appliances", "Decor"] 
+    {
+      name: "Home",
+      icon: "home.png",
+      subcategories: ["Furniture", "Appliances", "Decor"],
     },
-    { 
-      name: "Garden", 
-      icon: "sprout.png", 
-      subcategories: ["Plants", "Tools", "Outdoor Decor"] 
+    {
+      name: "Garden",
+      icon: "sprout.png",
+      subcategories: ["Plants", "Tools", "Outdoor Decor"],
     },
-    { 
-      name: "Kids", 
-      icon: "stroller.png", 
-      subcategories: ["Clothing", "Toys", "School Supplies"] 
+    {
+      name: "Kids",
+      icon: "stroller.png",
+      subcategories: ["Clothing", "Toys", "School Supplies"],
     },
-    { 
-      name: "Toys", 
-      icon: "scissors.png", 
-      subcategories: ["Action Figures", "Board Games", "Puzzles"] 
+    {
+      name: "Toys",
+      icon: "scissors.png",
+      subcategories: ["Action Figures", "Board Games", "Puzzles"],
     },
-    { 
-      name: "Gaming", 
-      icon: "game.png", 
-      subcategories: ["Consoles", "Games", "Accessories"] 
+    {
+      name: "Gaming",
+      icon: "game.png",
+      subcategories: ["Consoles", "Games", "Accessories"],
     },
-    { 
-      name: "Electronics", 
+    {
+      name: "Electronics",
       icon: "keyboard.png",
-      subcategories: ["Laptops", "Desktops", "Components"]
+      subcategories: ["Laptops", "Desktops", "Components"],
     },
-    { 
-      name: "Phones", 
-      icon: "smartphone.png", 
-      subcategories: ["Smartphones", "Cases", "Chargers"] 
+    {
+      name: "Phones",
+      icon: "smartphone.png",
+      subcategories: ["Smartphones", "Cases", "Chargers"],
     },
-    { 
-      name: "Sound & TV", 
-      icon: "wave-sound.png", 
-      subcategories: ["Headphones", "Speakers", "Televisions"] 
+    {
+      name: "Sound & TV",
+      icon: "wave-sound.png",
+      subcategories: ["Headphones", "Speakers", "Televisions"],
     },
-    { 
-      name: "Photography", 
-      icon: "camera.png", 
-      subcategories: ["Cameras", "Lenses", "Tripods"] 
+    {
+      name: "Photography",
+      icon: "camera.png",
+      subcategories: ["Cameras", "Lenses", "Tripods"],
     },
-    { 
-      name: "Clothing", 
-      icon: "shirt.png", 
-      subcategories: ["Men", "Women", "Kids"] 
+    {
+      name: "Clothing",
+      icon: "shirt.png",
+      subcategories: ["Men", "Women", "Kids"],
     },
-    { 
-      name: "Health", 
-      icon: "lotion.png", 
-      subcategories: ["Supplements", "Fitness", "Hygiene"] 
+    {
+      name: "Health",
+      icon: "lotion.png",
+      subcategories: ["Supplements", "Fitness", "Hygiene"],
     },
-    { 
-      name: "Sports", 
+    {
+      name: "Sports",
       icon: "basketball.png",
-      subcategories: ["Equipment", "Apparel", "Footwear"]
+      subcategories: ["Equipment", "Apparel", "Footwear"],
     },
   ];
 
@@ -108,13 +108,15 @@ export default function HomePage() {
       try {
         // fetch aggregator data for each visited category
         const promises = visitedCategories.map(async (catOrQuery) => {
-          const res = await fetch(`/api/searchProduct/${encodeURIComponent(catOrQuery)}`);
+          const res = await fetch(
+            `/api/searchProduct/${encodeURIComponent(catOrQuery)}`
+          );
           if (!res.ok) return [];
           const data = await res.json();
           return data.success ? (data.data as Product[]) : [];
         });
 
-        const allResults = await Promise.all(promises); 
+        const allResults = await Promise.all(promises);
         // => allResults[i] is array of products for visitedCategories[i]
 
         // Identify newest category => last in visitedCategories
@@ -199,7 +201,6 @@ export default function HomePage() {
 
   // store which category is selected
 
-
   // handleCategoryClick => show subcategories + add category to visited
   const handleCategoryClick = (categoryName: string) => {
     setSelectedCategory(categoryName);
@@ -242,19 +243,23 @@ export default function HomePage() {
   }
 
   return (
-    <div className={`${poppins.variable} bg-[#EFF2F4] text-[#1E252B] min-h-screen font-sans`}>
+    <div
+      className={`${poppins.variable} bg-[#EFF2F4] text-[#1E252B] min-h-screen font-sans`}
+    >
       {/* Hero Section */}
       <section className="flex flex-col md:flex-row items-center justify-between p-10 bg-[#053358] text-white">
         <div className="max-w-xl">
-          <h1 className={`${epilogue.className} text-4xl font-bold mb-4 leading-snug`}>
+          <h1
+            className={`${epilogue.className} text-4xl font-bold mb-4 leading-snug`}
+          >
             Search, compare, save
             <br />
             Find your next deal today
           </h1>
           <p className="mb-6">
             At PicPick you can compare prices on{" "}
-            <strong>8 million products</strong> from{" "}
-            <strong>6,300 shops</strong>
+            <strong>thousands of products</strong> from{" "}
+            <strong>300 shops</strong>
           </p>
           <div className="flex items-center bg-white rounded-full overflow-hidden max-w-md">
             <input
