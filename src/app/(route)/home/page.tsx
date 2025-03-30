@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 // import { poppins, epilogue } from "@/lib/fonts";
 import { Product } from "@/app/types/Product";
+import { poppins, epilogue } from "@/lib/fonts";
 
 export default function HomePage() {
   const router = useRouter();
