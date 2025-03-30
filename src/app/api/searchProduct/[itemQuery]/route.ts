@@ -28,9 +28,9 @@ export async function GET(request: NextRequest, { params }: { params: { itemQuer
 
     console.log(`Searching for: ${query}`);
 
-    // Check if we already have results for this query in MongoDB
-    const existingResults = await ProductSearchResult.findOne({ 
-      query: { $regex: new RegExp(queryString, 'i') } 
+    // == Check if we already have results for this query in MongoDB ==
+    const existingResults = await ProductSearchResult.findOne({
+      query: { $regex: new RegExp(queryString, 'i') }
     }).sort({ createdAt: -1 });
 
     if (existingResults) {
@@ -42,31 +42,42 @@ export async function GET(request: NextRequest, { params }: { params: { itemQuer
       });
     }
 
-    // This code is disabled but kept for future use
     
+
     // This function is in ProductPullerManager.ts
     // It merges results from SerpApi (and possibly others later).
     const listings = await fetchProductListings(query);
 
-    // Save the search query and its results to MongoDB
-    console.log("saving to db")
+
+
+    // === Save the search query and its results to MongoDB ====
+    
+    console.log("Saving to Db")
+    const existingResult = await ProductSearchResult.findOne({ query }); // check if the query already exists
+    // If it exists, remove it
+    if (existingResult) {
+      console.log(`Removing existing results for query: ${query}`);
+      await ProductSearchResult.deleteOne({ query });
+    }
+    // Create the new entry
     await ProductSearchResult.create({ query, results: listings });
+
 
     return NextResponse.json({
       success: true,
       data: listings,
       source: 'new'
     });
-    
-/*
-    // New searches are disabled for now
-    console.log('New searches are currently disabled');
-    return NextResponse.json({
-      success: false,
-      error: 'New searches are temporarily disabled. Please try an existing query.',
-      source: 'error'
-    }, { status: 503 });
-*/
+
+    /* ==== used when new searches are disabled ====
+        // New searches are disabled for now
+        console.log('New searches are currently disabled');
+        return NextResponse.json({
+          success: false,
+          error: 'New searches are temporarily disabled. Please try an existing query.',
+          source: 'error'
+        }, { status: 503 });
+    */
 
   } catch (error) {
     console.error('Error in searchProduct route:', error);
