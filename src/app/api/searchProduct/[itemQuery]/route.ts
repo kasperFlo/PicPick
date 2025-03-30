@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchProductListings } from '@/lib/ProductPullerManager';
 import { dbConnect } from '@/lib/DB/db';
 import ProductSearchResult from '@/lib/ProductAPI/ProductModels';
-import { fetchProductListings } from '@/lib/ProductPullerManager';
+// import { fetchProductListings } from '@/lib/ProductPullerManager';
 
 // Helper to push amazon.com links to bottom
 function prioritizeDirectLinks(products: any[]) {
