@@ -1,47 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useSearch } from '@/app/contexts/SearchContext';
 
-export default function header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+export default function Header() {
+  const router = useRouter();
+  const { searchQuery, setSearchQuery } = useSearch();
+  const [query, setQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    // Update the context with the search query
+    setSearchQuery(query);
+    
+    // Redirect to the search page with the query
+    router.push(`/search?q=${encodeURIComponent(query)}`);
+  };
+
+  
 
   return (
-    <header className="sticky top-0 z-50 bg-white text-black shadow-md">
-      <div className="flex justify-between items-center p-4">
-        <div className="flex items-center gap-2">
-          <span className="text-pink-500 font-bold text-lg">🌟</span>
-          <span className="font-semibold text-lg">PicPick</span>
+    <header className="bg-[#053358] text-white">
+      <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between">
+        <div className="flex items-center mb-4 md:mb-0">
+          <Link href="/" className="text-2xl font-bold">PicPick</Link>
         </div>
-        <nav className="hidden md:flex gap-6 text-sm">
-          <a href="#">All categories</a>
-          <a href="#">Sale</a>
-          <a href="#">Blogs</a>
-          <a href="#">How to use</a>
-          <a href="#">About us</a>
+        
+        <form onSubmit={handleSearch} className="w-full md:w-1/2 mb-4 md:mb-0">
+          <div className="flex rounded-full overflow-hidden shadow-md">
+            <input
+              type="text"
+              placeholder="Search for products..."
+              value={query}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
+              className="flex-grow p-2 text-[#333F49] focus:outline-none bg-[#BCDFFB]"
+            />
+            <button 
+              type="submit" 
+              className="bg-[#2196F3] hover:bg-[#0966AF] text-white px-4 py-2 transition-colors"
+            >
+              Search
+            </button>
+          </div>
+        </form>
+        
+        <nav className="flex space-x-4">
+          <Link href="/wishlist" className="hover:text-[#6EB8F7]">Wishlist</Link>
+          <Link href="/account" className="hover:text-[#6EB8F7]">Account</Link>
         </nav>
-        <button
-          className="md:hidden text-2xl"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          ☰
-        </button>
-        <button className="hidden md:block border border-gray-400 px-4 py-1 rounded-full text-sm">
-          Sign in
-        </button>
       </div>
-
-      {menuOpen && (
-        <div className="md:hidden flex flex-col gap-3 p-4 bg-white border-t border-gray-200 text-sm">
-          <a href="#">All categories</a>
-          <a href="#">Sale</a>
-          <a href="#">Blogs</a>
-          <a href="#">How to use</a>
-          <a href="#">About us</a>
-          <button className="border border-gray-400 px-4 py-1 rounded-full text-sm w-max">
-            Sign in
-          </button>
-        </div>
-      )}
     </header>
   );
 }

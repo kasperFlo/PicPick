@@ -1,6 +1,8 @@
 import mongoose, { Document, Model } from 'mongoose';
 
+
 // ========== 1) Mongoose Model ==========
+ 
 export interface IFactory extends Document {
   name: string;
   description?: string;
@@ -23,129 +25,135 @@ const FactorySchema = new Schema<IFactory>(
 const Factory: Model<IFactory> =
   models.Factory || model<IFactory>('Factory', FactorySchema);
 
+// We'll export it in case you still use it:
 export default Factory;
 
-
-// ========== 2) PRODUCT LISTING INTERFACE ==========
-
+/**
+ * ========== 2) ProductListingInfo Interface ==========
+ * This defines how each product should look once we've fetched
+ * and transformed it from SerpApi (or other sources).
+ */
 export interface ProductListingInfo {
-  name: string;                      // e.g. "Apple MacBook Pro 14-inch"
+  name: string; 
   price: {
-    value: number;                   // e.g. 1499.99
-    currency: string;               // e.g. "USD"
-    formatted: string;              // e.g. "$1,499.99"
+    value: number;
+    currency: string;
+    formatted: string;
   };
-  seller: string;                    // e.g. "Best Buy" or "Amazon"
-  platform: string;                  // e.g. "GoogleShopping", "Amazon", "BestBuy"
-  link: string;                      // product detail page
-  image: string;                     // main product image URL
+  seller: string;   
+  platform: string; 
+  link: string;     
+  image: string;    
   rating?: {
-    value: number;                   // e.g. 4.7
-    count: number;                   // e.g. 120 (number of reviews)
+    value: number;
+    count: number;
   };
-  shipping?: string;                 // e.g. "Free shipping"
-  condition?: string;               // e.g. "New" or "Refurbished"
+  shipping?: string;
+  condition?: string;
 }
 
-
-// ========== 3) MAIN FUNCTION TO FETCH AGGREGATED LISTINGS ==========
-
 /**
- * fetchProductListings - Aggregates product data from multiple sources
- * (Google, Amazon, BestBuy, etc.) and returns a standardized array of
- * ProductListingInfo objects.
- *
- * @param query - Search term (e.g. "macbook" or "iphone")
+ * ========== 3) Main Aggregator Function ==========
+ * fetchProductListings - Aggregates product data from multiple sources.
+ * Right now, we only integrate SerpApi (Google Shopping).
+ * 
+ * @param query - The search term (e.g., "macbook").
  * @returns Promise<ProductListingInfo[]>
  */
 export async function fetchProductListings(
   query: string
 ): Promise<ProductListingInfo[]> {
-  // 1) Call each source in parallel (these are placeholders):
-  const [googleData, amazonData, bestBuyData] = await Promise.all([
+  // We only call SerpApi / Google for now, but you could
+  // add Amazon or BestBuy calls similarly in the future.
+  const [googleData] = await Promise.all([
     pullFromGoogle(query),
-    pullFromAmazon(query),
-    pullFromBestBuy(query),
   ]);
 
-  // 2) Combine into one array
-  const combined = [...googleData, ...amazonData, ...bestBuyData];
-
-  // 3) Return sorted/filtered if needed, or just return combined as-is
-  return combined;
+  // Combine all results (right now it's just googleData).
+  return [...googleData];
 }
 
-
-// ========== 4) PLACEHOLDER DATA FETCHERS ==========
-// In real code, these would fetch data from external APIs (GoogleShopping, Amazon, etc.)
-// and shape them into ProductListingInfo format.
-
+/**
+ * ========== 4) SerpApi (Google Shopping) Integration ==========
+ * This function makes a real HTTP request to SerpApi's Google Shopping engine,
+ * retrieves multiple result arrays (shopping_results, inline_shopping_results,
+ * featured_shopping_results), then merges them into a single array of ProductListingInfo.
+ */
 async function pullFromGoogle(query: string): Promise<ProductListingInfo[]> {
-  // Example mock data:
-  return [
-    {
-      name: `Google Mock - ${query}`,
-      price: {
-        value: 899.99,
-        currency: 'USD',
-        formatted: '$899.99',
-      },
-      seller: 'BestDealz',
-      platform: 'GoogleShopping',
-      link: 'https://google.com/shopping/...',
-      image: 'https://via.placeholder.com/200x200?text=GoogleMock',
-      rating: {
-        value: 4.5,
-        count: 230,
-      },
-      shipping: 'Free shipping',
-      condition: 'New',
-    },
-  ];
-}
+  try {
+    const serpApiKey = process.env.SERPAPI_KEY;
+    if (!serpApiKey) {
+      console.error('SERPAPI_KEY not found in environment variables');
+      return [];
+    }
 
-async function pullFromAmazon(query: string): Promise<ProductListingInfo[]> {
-  return [
-    {
-      name: `Amazon Mock - ${query}`,
-      price: {
-        value: 999.99,
-        currency: 'USD',
-        formatted: '$999.99',
-      },
-      seller: 'Amazon',
-      platform: 'Amazon',
-      link: 'https://amazon.com/dp/123ABC',
-      image: 'https://via.placeholder.com/200x200?text=AmazonMock',
-      rating: {
-        value: 4.2,
-        count: 512,
-      },
-      shipping: 'Free Prime Delivery',
-      condition: 'New',
-    },
-  ];
-}
+    // Build SerpApi URL (enabling direct_link for new layout)
+    const url = new URL('https://serpapi.com/search.json');
+    url.searchParams.set('engine', 'google_shopping');
+    url.searchParams.set('q', query);
+    url.searchParams.set('api_key', serpApiKey);
+    url.searchParams.set('direct_link', 'true'); // request direct links
 
-async function pullFromBestBuy(query: string): Promise<ProductListingInfo[]> {
-  return [
-    {
-      name: `BestBuy Mock - ${query}`,
-      price: {
-        value: 1099.99,
-        currency: 'USD',
-        formatted: '$1,099.99',
-      },
-      seller: 'Best Buy',
-      platform: 'BestBuy',
-      link: 'https://bestbuy.com/site/product/999',
-      image: 'https://via.placeholder.com/200x200?text=BestBuyMock',
-      rating: {
-        value: 4.7,
-        count: 74,
-      },
-      shipping: 'Standard shipping',
-      condition: 'New',
-    },
-  ];
+    console.log(`pullFromGoogle() -> ${url.toString()}`);
+
+    // Fetch from SerpApi
+    const response = await fetch(url.toString(), { method: 'GET' });
+    if (!response.ok) {
+      console.error('SerpApi request failed:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+
+    // Combine all relevant arrays to get more results
+    const rawShopping = data.shopping_results || [];
+    const rawInline = data.inline_shopping_results || [];
+    const rawFeatured = data.featured_shopping_results || [];
+    const combined = [...rawShopping, ...rawInline, ...rawFeatured];
+
+    // Filter to only items that have a product_link property
+    const filtered = combined.filter((item: any) => item.product_link);
+
+    // Map filtered items to your ProductListingInfo shape
+    const results: ProductListingInfo[] = filtered.map((item: any) => {
+      const name = item.title || 'No Title';
+      const priceNumber = item.extracted_price || 0;
+      const currency = 'USD';
+      const formattedPrice = item.price || `$${priceNumber}`;
+      const seller = item.source || 'Unknown seller';
+      // We intentionally do NOT fall back to item.link or anything else,
+      // since you only want items that definitely have a product_link.
+      // We'll set link = item.product_link directly.
+      const linkCandidate = item.product_link;
+      const image = item.thumbnail || '';
+      const ratingValue = item.rating || 0;
+      const ratingCount = item.reviews || 0;
+      const shipping = item.delivery || 'N/A';
+      const condition = item.second_hand_condition || 'New';
+
+      return {
+        name,
+        price: {
+          value: priceNumber,
+          currency,
+          formatted: formattedPrice,
+        },
+        seller,
+        platform: 'GoogleShopping',
+        link: linkCandidate, // Use product_link as the final link
+        image,
+        rating:
+          ratingValue > 0
+            ? { value: ratingValue, count: ratingCount }
+            : undefined,
+        shipping,
+        condition,
+      };
+    });
+
+    return results;
+  } catch (error) {
+    console.error('Error in pullFromGoogle:', error);
+    return [];
+  }
 }

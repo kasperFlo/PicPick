@@ -30,6 +30,7 @@ async function dbConnect() {
         'Please define the MONGODB_URI environment variable inside .env.local'
       );
     }
+    
     console.log("Connecting to MongoDB... String -> " + MONGODB_URI);
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       console.log("Connected to MongoDB");
