@@ -30,7 +30,7 @@ export const authOptions: AuthOptions = {
         if (!isValid) throw new Error("Invalid password");
 
         return {
-          id: user._id.toString(),
+          id: user.id.toString(),
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
         };
@@ -52,9 +52,15 @@ export const authOptions: AuthOptions = {
   },
 
   callbacks: {
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.sub as string;
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    session: async ({ session, token }) => {
+      if (session.user) {
+        session.user.id = token.id as string;
       }
       return session;
     },

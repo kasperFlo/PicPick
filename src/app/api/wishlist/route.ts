@@ -10,20 +10,25 @@ export async function GET() {
   console.log('GET request to /api/wishlist received');
   
   try {
-    await dbConnect();
-    
+      
+      const session = await getServerSession(authOptions);
+      if (!session || !session.user) {
+          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        
+        await dbConnect();
     // For testing, get the admin user's wishlist
-    const adminUser = await User.findOne({ username: 'AdminTest' })
+    const user = await User.findById(session.user.id)
       .select('wishlist')
       .lean();
     
-    if (!adminUser) {
+    if (!user) {
       console.log('Admin user not found');
       return NextResponse.json({ error: 'Admin user not found' }, { status: 404 });
     }
     
-    console.log('Returning wishlist with', adminUser.wishlist.length, 'items');
-    return NextResponse.json({ wishlist: adminUser.wishlist });
+    console.log('Returning wishlist with', user.wishlist.length, 'items');
+    return NextResponse.json({ wishlist: user.wishlist });
     
     /* Use this code for production with authenticated users
     const session = await getServerSession(authOptions);
@@ -66,8 +71,6 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     console.log('Connected to database');
     
-    // For testing, use the admin user
-    // Check if product already exists in wishlist
     const existingProduct = await User.findOne({
       username: 'AdminTest',
       'wishlist.link': product.link
