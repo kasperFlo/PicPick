@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { poppins, epilogue } from "@/lib/fonts";
+import { poppins, epilogue } from "@/lib/types/fonts";
 import { useSearchParams } from "next/navigation";
 import { useSearch } from "@/app/contexts/SearchContext";
 import SearchForm from "@/app/components/searchform";
@@ -12,7 +12,7 @@ import LoadingSpinner from "@/app/components/Ui/LoadingSpinner";
 import ErrorMessage from "@/app/components/Ui/ErrorMessage";
 import EmptyState from "@/app/components/Ui/EmptyState";
 import NoValidState from "@/app/components/Ui/NoValidState";
-import { Product } from "@/app/types/Product";
+import { Product } from "@/lib/types/Product";
 
 export default function SearchPage() {
   const {setSearchQuery } = useSearch();

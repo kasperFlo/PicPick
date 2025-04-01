@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/DB/db';
+import { dbConnect } from '@/lib/DB/DBmanager';
 import { Review } from '@/lib/DB/schema';
 
 // This API route handles GET requests to fetch review data

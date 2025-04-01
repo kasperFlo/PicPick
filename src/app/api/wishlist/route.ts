@@ -1,9 +1,9 @@
 // app/api/wishlist/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/DB/db';
-import { User } from '@/lib/DB/schema';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { dbConnect } from '@/lib/DB/DBmanager';
+import { User } from '@/lib/DB/DBModels/User';
+// import { getServerSession } from 'next-auth/next';
+// import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 // Get the current wishlist
 export async function GET() {

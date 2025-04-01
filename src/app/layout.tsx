@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { poppins } from "@/lib/fonts";
+import { poppins } from "@/lib/types/fonts";
 import Header from "@/app/components/header";
-import { Providers } from "@/app/providers";
+import { Providers } from "@/app/contexts/providers";
 
 export const metadata: Metadata = {
   title: "Shopping Platform",
@@ -17,6 +17,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} bg-white`}>
+        <script src="http://accounts.google.com/gsi/client"> </script> // Google Sign In
+
         <Providers>
           <div className="min-h-screen flex flex-col">
             <Header />

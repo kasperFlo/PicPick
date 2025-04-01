@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/DB/db';
-import { User } from '@/lib/DB/schema';
+import { dbConnect } from '@/lib/DB/DBmanager';
+import { User } from '@/lib/DB/DBModels/User';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 // This API route handles GET requests to fetch user data
 export async function GET() {
-  console.log('Fetching user data...');
+  await dbConnect(); // Ensure the database is connected
   
   try {
     const session = await getServerSession(authOptions);
@@ -18,11 +18,11 @@ export async function GET() {
       );
     }
     
-    await dbConnect();
     
     // Find the current user by ID from session
-    const currentUser = await User.findOne({ username: 'AdminTest' })
-    .select('-password')  // exclude password
+    console.log('Fetching user data...');
+    const currentUser = await User.findOne({ username: 'AdminTest' }) // currently hard coded but will be replaced with session.user.id
+    .select('-password')  
     .lean();
       
     if (!currentUser) {
@@ -32,7 +32,9 @@ export async function GET() {
       );
     }
     
-    return NextResponse.json({
+    // get Responce with user data
+    return NextResponse.json({ 
+      Code: 200,
       user: {
         username: currentUser.username,
         firstName: currentUser.firstName,

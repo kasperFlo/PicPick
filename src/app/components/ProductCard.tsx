@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { epilogue } from "@/lib/fonts";
-import { Product } from "@/app/types/Product";
+import { epilogue } from "@/lib/types/fonts";
+import { Product } from "@/lib/types/Product";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import VisibilityIcon from "@mui/icons-material/Visibility";

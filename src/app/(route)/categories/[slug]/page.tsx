@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Product } from "@/app/types/Product";
+import { Product } from "@/lib/types/Product";
 
 export default function CategoryPage() {
   const router = useRouter();

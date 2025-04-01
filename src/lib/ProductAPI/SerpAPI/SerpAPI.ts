@@ -1,7 +1,7 @@
 // File: /src/lib/ProductAPI/serpApi.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ProductListingInfo } from './ProductModels';
+import { ProductListingInfo } from '../ProductModels';
 
 // Helper function to determine the platform from source or link
 function determinePlatform(source: string, link: string): string {

@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { poppins, epilogue } from '@/lib/fonts';
+import { poppins, epilogue } from '@/lib/types/fonts';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';

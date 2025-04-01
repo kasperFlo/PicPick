@@ -1,9 +1,9 @@
 // File: /app/api/searchProduct/[itemQuery]/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { dbConnect } from "@/lib/DB/db";
+import { dbConnect } from "@/lib/DB/DBmanager";
 import ProductSearchResult from "@/lib/ProductAPI/ProductModels";
-import { fetchProductListings } from "@/lib/ProductPullerManager";
+import { fetchProductListings } from "@/lib/ProductAPI/ProductPullerManager";
 
 interface Product {
   name: string;

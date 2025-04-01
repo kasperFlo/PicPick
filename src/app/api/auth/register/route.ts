@@ -1,7 +1,7 @@
 // src/app/api/auth/register/route.ts
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { dbConnect } from "@/lib/DB/db";
+import { dbConnect } from "@/lib/DB/DBmanager";
 import User from "@/lib/DB/DBModels/User";
 
 export async function POST(req: Request) {
