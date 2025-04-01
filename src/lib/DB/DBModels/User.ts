@@ -1,32 +1,10 @@
 import mongoose, { Document, Model } from 'mongoose';
+const { Schema, model, models } = mongoose;  // Importing the necessary modules done this way ig
 
 
-const { Schema, model, models } = mongoose;
-
-// ========== 1) INTERFACES ==========
+// ========== 1) SCHEMAS ==========
 
 // For an individual wishlist item
-export interface IWishlistItem {
-  link: string;
-  price: number;
-  name: string;
-}
-
-// For the user document
-export interface IUser extends Document {
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  wishlist: IWishlistItem[];
-  createdAt: Date;
-  updatedAt?: Date;
-}
-
-// ========== 2) SCHEMAS ==========
-
-// For the array of wishlist items
 const WishlistItemSchema = new Schema({
   link: { type: String, required: true },
   price: { type: Number, required: true },
@@ -34,8 +12,7 @@ const WishlistItemSchema = new Schema({
 });
 
 // For the User itself
-const UserSchema = new Schema<IUser>(
-  {
+const UserSchema = new Schema({
     username: {
       type: String,
       required: [true, 'Username is required'],
@@ -66,13 +43,11 @@ const UserSchema = new Schema<IUser>(
     wishlist: [WishlistItemSchema],
   },
   {
-    timestamps: true // automatically adds "createdAt" and "updatedAt"
+    timestamps: true 
   }
 );
 
 // ========== 3) MODEL CREATION ==========
 
-// Avoid recompiling model if it's already compiled (Next.js quirk)
-const User: Model<IUser> = models.User || model<IUser>('User', UserSchema);
-
-export default User;
+export const User = model('User' , UserSchema); 
+export const Wishlist = model('Wishlist' , WishlistItemSchema); 

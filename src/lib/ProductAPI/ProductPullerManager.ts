@@ -1,6 +1,6 @@
 // File: /src/lib/ProductAPI/ProductPullerManager.ts
 
-import { ProductListingInfo } from './ProductAPI/ProductModels';
+import { ProductListingInfo } from './ProductModels';
 
 /**
  * ========== fetchProductListings ==========
