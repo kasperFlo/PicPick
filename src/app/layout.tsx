@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} bg-white`}>
-        <script src="http://accounts.google.com/gsi/client"> </script> // Google Sign In
+      <script src="https://accounts.google.com/gsi/client" async defer></script>
 
         <Providers>
           <div className="min-h-screen flex flex-col">
@@ -44,6 +44,7 @@ export default function RootLayout({
             </footer>
           </div>
         </Providers>
+        
       </body>
     </html>
   );
