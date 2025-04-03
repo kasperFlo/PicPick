@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearch } from "@/app/contexts/SearchContext";
 import { useSession, signOut } from "next-auth/react";
+
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Header() {
   const router = useRouter();
+
   const { setSearchQuery } = useSearch();
   const [query, setQuery] = useState("");
   const { data: session } = useSession();
@@ -20,6 +22,7 @@ export default function Header() {
     router.push(`/search?q=${encodeURIComponent(query)}`);
   };
 
+  
   return (
     <header className="bg-[#053358] text-white relative">
       <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between">
