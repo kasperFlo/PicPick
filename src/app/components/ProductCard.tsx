@@ -65,7 +65,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       setIsLoading(false);
     }
   };
-
+  // returns product cards
   return (
     <div className="bg-white border border-[#E2E7EB] rounded-lg p-4 shadow hover:shadow-lg transition flex flex-col h-full">
       <div className="flex justify-between items-start mb-3">
